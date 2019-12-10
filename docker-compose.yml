@@ -18,7 +18,7 @@ services:
               #                aliases:
               #                    - "nginx"
         ports:
-            - "80:80"
+            - "8887:80"
             - "443:443"
         networks:
             - php
