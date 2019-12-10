@@ -1,0 +1,114 @@
+version: "3"
+services:
+    nginx:
+        image: webdevops/nginx
+        #domainname: local
+        hostname: nginx
+        environment:
+            WEB_PHP_SOCKET: php:9000
+            WEB_DOCUMENT_ROOT: /app/public
+        volumes:
+            - app:/app
+        links:
+            - php
+        depends_on:
+            - php
+              #        networks:
+              #            nacho-project.com:
+              #                aliases:
+              #                    - "nginx"
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - php
+
+    php:
+        image: webdevops/php:7.3
+        #domainname: local
+        hostname: php
+        environment:
+            PHP_DISPLAY_ERRORS: 1
+        volumes:
+            - app:/app
+        networks:
+            - db
+            - php
+
+    mysql:
+        image: mysql:5.7
+        restart: always
+        #domainname: local
+        ports:
+            - "3306:3306"
+        #networks:
+        #    nacho-project.com:
+        #        aliases:
+        #            - "mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: "${MYSQL_DB_ROOT_PASSWORD}"
+            MYSQL_DATABASE: "${MYSQL_DB_NAME}"
+            MYSQL_USER: "${MYSQL_DB_USERNAME}"
+            MYSQL_PASSWORD: "${MYSQL_DB_PASSWORD}"
+
+            #networks:
+            #    nacho-project.com:
+            #        ipam:
+            #            driver: default
+            #            config:
+            #                - subnet: ${PROJECT_SUBNET}
+        networks:
+            - db
+
+
+    redis:
+        image: redis:5.0
+        ports:
+            - "6555:6379"
+        networks:
+            - php
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        depends_on:
+            - mysql
+        restart: always
+        #domainname: local
+        ports:
+            - 8899:80
+              #        expose:
+              #            - "80"
+              #              #        networks:
+              #              #        symfony-docker-dev.com:
+              #              #            aliases:
+              #              #            - "phpmyadmin"
+        links:
+            - mysql:db
+        volumes:
+            - /sessions
+        networks:
+            - db
+
+              #    node:
+              #        image: "node:8"
+              #        user: "node"
+              #        working_dir: /app
+              #        environment:
+              #            - NODE_ENV=development
+              #        volumes:
+              #            - app:/app
+              #        expose:
+              #            - "8081"
+              #        command: "yarn install"
+
+networks:
+    db:
+    php:
+
+volumes:
+    app:
+        driver: local
+        driver_opts:
+            type: none
+            device: $PWD
+            o: bind

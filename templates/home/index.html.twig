@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div class='container mt-3'>
+    <a href='{{ path('json') }}' class='btn btn-success mb-2'>Fetch Json</a>
+    {% for post in posts %}
+    <div class="card mb-3">
+        <div class="card-body">
+            {% if post.getImageLink() %}
+            <img src="{{ post.getImageLink() }}" class="card-img-top" alt="Image" style='width:15em;'>
+            {% endif %}
+            <h5 class="card-title">{{ post.getTitle() }}</h5>
+
+            {% if post.getHeadline() %}
+            <h6 class="card-subtitle mb-2 text-muted">{{ post.getHeadline() }}</h6>
+            {% endif %}
+
+            <p class="card-text">{{ post.getBody() }}</p>
+            <p class="card-text">Created: {{ post.getDateCreated() | date }}</p>
+            <p class="card-text">Author: {{ post.getAuthorName() }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
